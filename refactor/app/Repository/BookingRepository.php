@@ -385,14 +385,14 @@ class BookingRepository extends BaseRepository
         $jobid = $post_data["job_id"];
         $job_detail = Job::with('translatorJobRel')->find($jobid);
         $duedate = $job_detail->due;
-        $start = date_create($duedate);
-        $end = date_create($completeddate);
-        $diff = date_diff($end, $start);
-        $interval = $diff->h . ':' . $diff->i . ':' . $diff->s;
+        // $start = date_create($duedate);
+        // $end = date_create($completeddate);
+        // $diff = date_diff($end, $start);
+        // $interval = $diff->h . ':' . $diff->i . ':' . $diff->s;
         $job = $job_detail;
         $job->end_at = date('Y-m-d H:i:s');
         $job->status = 'completed';
-        $job->session_time = $interval;
+        $job->session_time = $this->sessionTime($duedate, $completeddate);
 
         $user = $job->user()->get()->first();
         if (!empty($job->user_email)) {
@@ -1602,14 +1602,14 @@ class BookingRepository extends BaseRepository
             return ['status' => 'success'];
 
         $duedate = $job_detail->due;
-        $start = date_create($duedate);
-        $end = date_create($completeddate);
-        $diff = date_diff($end, $start);
-        $interval = $diff->h . ':' . $diff->i . ':' . $diff->s;
+        // $start = date_create($duedate);
+        // $end = date_create($completeddate);
+        // $diff = date_diff($end, $start);
+        // $interval = $diff->h . ':' . $diff->i . ':' . $diff->s;
         $job = $job_detail;
         $job->end_at = date('Y-m-d H:i:s');
         $job->status = 'completed';
-        $job->session_time = $interval;
+        $job->session_time = $this->sessionTime($duedate, $completeddate);
 
         $user = $job->user()->get()->first();
         if (!empty($job->user_email)) {
@@ -1662,11 +1662,11 @@ class BookingRepository extends BaseRepository
         $completeddate = date('Y-m-d H:i:s');
         $jobid = $post_data["job_id"];
         $job_detail = Job::with('translatorJobRel')->find($jobid);
-        $duedate = $job_detail->due;
-        $start = date_create($duedate);
-        $end = date_create($completeddate);
-        $diff = date_diff($end, $start);
-        $interval = $diff->h . ':' . $diff->i . ':' . $diff->s;
+        // $duedate = $job_detail->due;
+        // $start = date_create($duedate);
+        // $end = date_create($completeddate);
+        // $diff = date_diff($end, $start);
+        // $interval = $diff->h . ':' . $diff->i . ':' . $diff->s;
         $job = $job_detail;
         $job->end_at = date('Y-m-d H:i:s');
         $job->status = 'not_carried_out_customer';
@@ -2179,6 +2179,19 @@ class BookingRepository extends BaseRepository
         $minutes = ($time % 60);
         
         return sprintf($format, $hours, $minutes);
+    }
+
+    /**
+     * @param  date $duedate   
+     * @param  date $completeddate 
+     * @return string         
+     */
+    private function sessionTime($duedate, $completeddate)
+    {
+        $start = date_create($duedate);
+        $end = date_create($completeddate);
+        $diff = date_diff($end, $start);
+        return $diff->h . ':' . $diff->i . ':' . $diff->s;
     }
 
 }
